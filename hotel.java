@@ -4,6 +4,7 @@ class Main {
     public static void main(String args[]) {
         Scanner in = new Scanner(System.in);
         System.out.println("Program started");
+        ArrayList<Integer> rooms = new ArrayList<>();
 
         while (true) {
             System.out.println("\n=== MENU ===");
@@ -11,32 +12,54 @@ class Main {
             System.out.println("2. Show available rooms");
             System.out.println("3. Book a room");
             System.out.println("6. Exit");
+
             int choice = in.nextInt();
             in.nextLine(); // consume leftover newline
 
             switch (choice) {
                 case 1:
-                    // You can implement room addition here
-                    System.out.println("Feature not implemented yet.");
+                    while (true) {
+                        System.out.println("Enter the room number:");
+                        int room_number = in.nextInt();
+                        in.nextLine();
+
+                        if (!rooms.contains(room_number)) {
+                            rooms.add(room_number);
+                        } else {
+                            System.out.println("Room already exists! Add another entry");
+                        }
+
+                        System.out.println("Do you wish to add another room (y/n)?");
+                        String moreRooms = in.nextLine();
+                        if (moreRooms.equalsIgnoreCase("n")) break;
+                    }
                     break;
 
                 case 2:
-                    // You can implement a list of available rooms
-                    System.out.println("Feature not implemented yet.");
+                    System.out.println("List of available rooms:");
+                    for (int room : rooms) {
+                        System.out.print(room + ", ");
+                    }
+                    System.out.println();
                     break;
 
                 case 3:
-                    // Create a new room and book it
-                    room booked = new room();
-
-                    System.out.println("Enter the room number to be booked: ");
+                    System.out.println("Enter the room number to be booked:");
                     int roomNumber = in.nextInt();
+
+                    if (!rooms.contains(roomNumber)) {
+                        System.out.println("Room Unavailable");
+                        continue;
+                    }
+
+                    System.out.println("Room available!");
+                    room booked = new room();
                     booked.setnumber(roomNumber);
                     in.nextLine(); // consume newline
 
-                    System.out.println("Enter the type of room you would like (single/double/delux):");
+                    System.out.println("Enter the type of room (single/double/delux):");
                     String type = in.nextLine();
-                    booked.setprice(type); // set price and confirmation inside
+                    booked.setprice(type); // includes confirmation inside
 
                     // Collect customer details
                     System.out.println("Enter your name:");
@@ -45,16 +68,40 @@ class Main {
                     System.out.println("Enter your age:");
                     int age = in.nextInt();
 
+                    if (age < 18) {
+                        System.out.println("Ineligible to book");
+                        continue;
+                    }
+
                     System.out.println("Enter your phone number:");
                     long phone = in.nextLong();
 
-                    // Create customer object and link room
                     customer c = new customer();
+
+                    System.out.println("Enter the number of people:");
+                    int ppl = in.nextInt();
+
+                    if (ppl > 3) {
+                        System.out.println("Not more than 3 persons allowed in the room!");
+                        continue;
+                    }
+
+                    System.out.println("Enter the number of adults (18+):");
+                    int A = in.nextInt();
+                    in.nextLine(); // consume newline
+
+                    int B = ppl - A;
+
+                    c.setadults(A);
+                    c.setnotadults(B);
+                    c.settotal(ppl);
                     c.setname(name);
                     c.setage(age);
                     c.setnumber(phone);
-                    c.setr(booked); // assign room
-                    c.displaydetails(); // show all details
+                    c.setr(booked);
+
+                    c.displaydetails();
+                    rooms.remove(Integer.valueOf(roomNumber));
                     break;
 
                 case 6:
@@ -70,11 +117,11 @@ class Main {
 
 // ---------------- Room Class ----------------
 class room {
-    String confirm;
-    int number;
-    boolean status;
-    String type;
-    int price;
+    private String confirm;
+    private int number;
+    private boolean status;
+    private String type;
+    private int price;
 
     String gettype() {
         return type;
@@ -87,6 +134,7 @@ class room {
     void setprice(String type) {
         Scanner in = new Scanner(System.in);
         this.type = type;
+
         if (type.equalsIgnoreCase("single")) {
             this.price = 5000;
         } else if (type.equalsIgnoreCase("delux")) {
@@ -119,10 +167,37 @@ class room {
 
 // ---------------- Customer Class ----------------
 class customer {
-    room booked;
-    String name;
-    int age;
-    long number;
+    private room booked;
+    private String name;
+    private int age;
+    private long number;
+    private int adults;
+    private int notadults;
+    private int total;
+
+    int gettotal() {
+        return total;
+    }
+
+    void settotal(int ppl) {
+        this.total = ppl;
+    }
+
+    int getadults() {
+        return adults;
+    }
+
+    int getnotadults() {
+        return notadults;
+    }
+
+    void setadults(int A) {
+        this.adults = A;
+    }
+
+    void setnotadults(int B) {
+        this.notadults = B;
+    }
 
     void setr(room r) {
         this.booked = r;
@@ -160,6 +235,10 @@ class customer {
         System.out.println("Room Number: " + booked.getnumber());
         System.out.println("Room Type: " + booked.gettype());
         System.out.println("Room Price: ₹" + booked.getprice());
+        System.out.println("Total number of people: " + total);
+        System.out.println("Total number of adults: " + adults);
+        System.out.println("Total number of not adults: " + notadults);
         System.out.println("Booking Confirmed: " + (booked.getstatus() ? "Yes" : "No"));
+        System.out.println();
     }
 }
