@@ -37,9 +37,8 @@ class Main {
 
                 case 2:
                     System.out.println("List of available rooms:");
-                    for (int room : rooms) {
-                        System.out.print(room + ", ");
-                    }
+                    Collections.sort(rooms);
+                    System.out.println(rooms);
                     System.out.println();
                     break;
 
